@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List With Filtering</title>
+</head>
+<body>
+    <div id="root"></div>
+    <script src="https://www.unpkg.com/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://www.unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+        function App(){
+            const [todo, setTodo] = React.useState([]);
+            const [newTodo, setNewTodo] = React.useState('');
+            const [filter, setFilter] = React.useState('All');//init setting the filter value to All;
+
+            // console.log(newTodo);
+            const addTodo = () =>{
+                setTodo([...todo, {id: Date.now(),todoName: newTodo, task: false}]);
+                setNewTodo('');
+            }
+            // console.log(todo);
+
+            const handleTask = (id) =>{
+                setTodo((prevTodo) => prevTodo.map((e) =>
+                    e.id === id ? {...e, task: !e.task} : e
+                ))
+            }
+
+            const handleDelete = (id) =>{
+                setTodo(prevTodo => prevTodo.filter(todo => todo.id !== id));
+            }
+
+            const handleFilter = (filter) =>{
+                setFilter(filter);
+            }
+
+            return(
+                <>
+                    <h1>Todo List</h1>
+                    <input type="text" value={newTodo} onChange={(e)=>setNewTodo(e.target.value)} placeholder='todo...'/>
+                    <button onClick={addTodo}>Add</button>
+                    
+                    <button onClick={()=>handleFilter('All')}>All</button>
+                    <button onClick={()=>handleFilter('Active')}>Active</button>
+                    <button onClick={()=>handleFilter('Completed')}>Completed</button>
+
+                    {todo.map(todos =>{
+                        if(filter === 'All' || (filter === 'Active' && !todos.task) || (filter === 'Completed' && todos.task)){
+                            return (
+                                <div key={todos.id}>
+                                    <span><b>{todos.todoName}</b></span>
+                                    <input type="checkbox" onChange={()=>handleTask(todos.id)} checked={todos.task}/>
+                                    <button onClick={()=>handleDelete(todos.id)}>Delete</button>
+                                </div>
+                            )
+                        }
+                        else{
+                            return null;
+                        }
+                    })}
+                </>
+            )
+        }
+
+        const root = document.getElementById('root');
+        ReactDOM.createRoot(root).render(<App />);
+    </script>
+</body>
+</html>
